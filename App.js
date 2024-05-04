@@ -37,10 +37,10 @@ const App = () => {
   return (
     <View style={styles.container}>
       <Text>Coins: {coins}</Text>
-      <TouchableOpacity style={styles.button} onPress={removeCoins}>
+      <TouchableOpacity style={styles.button_error} onPress={removeCoins}>
         <Text>Remove coins</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={removeMachineCount}>
+      <TouchableOpacity style={styles.button_error} onPress={removeMachineCount}>
         <Text>Remove machines</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={handleClick}>
@@ -52,7 +52,7 @@ const App = () => {
         </TouchableOpacity>
       )}
       {coins < 10 && (
-        <TouchableOpacity style={styles.button_}>
+        <TouchableOpacity style={styles.button_disabled}>
           <Text>Buy Machine for 10 Coins</Text>
         </TouchableOpacity>
       )}
@@ -72,7 +72,12 @@ const styles = StyleSheet.create({
     padding: 10,
     marginVertical: 10,
   },
-  button_: {
+  button_error: {
+    backgroundColor: 'pink',
+    padding: 10,
+    marginVertical: 10,
+  },
+  button_disabled: {
     backgroundColor: 'lightgray',
     padding: 10,
     marginVertical: 10,
