@@ -18,7 +18,7 @@ async function insertData(user, pass) {
     }
   }
   catch (error) {
-    Alert.alert("A felhasználónév már foglalt, kérlek adj meg egy másikat")
+    Alert.alert("A felhasználónév már foglalt, kérlek adj meg egy másikat.")
   }
 }
 
@@ -42,7 +42,7 @@ async function handleLogin(user, pass, nav) {
       nav.navigate('Game')
     } else {
       // Nincs találat
-      Alert.alert('Nincs ilyen felhasználó. Kérlek regisztrálj először');
+      Alert.alert('Nincs ilyen felhasználó! Kérlek regisztrálj először.');
     }
   } catch (error) {
     Alert.alert('Error checking user:', error.message);
