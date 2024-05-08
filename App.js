@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { useState, useEffect, createContext } from 'react';
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View, Image } from 'react-native';
 import supabase from './lib/supabase-client';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -18,7 +18,7 @@ async function insertData(user, pass) {
     }
   }
   catch (error) {
-    Alert.alert(error.message)
+    Alert.alert("A felhasználónév már foglalt, kérlek adj meg egy másikat")
   }
 }
 
@@ -39,7 +39,6 @@ async function handleLogin(user, pass, nav) {
 
     if (data.length > 0) {
       // Van találat
-      Alert.alert('Juppe')
       nav.navigate('Game')
     } else {
       // Nincs találat
@@ -62,15 +61,15 @@ function HomeScreen({navigation}) {
   return (
     <SessionContext.Provider value={session}>
       <View style={styles.container}>
-        <Text style={[{color: '#fff'}]}>Szevasz!</Text>
-        <TextInput style={styles.textInput} onChangeText={(value) => SetUser(value)}></TextInput>
-        <TextInput style={styles.textInput} onChangeText={(value) => setPass(value)}></TextInput>
-        <TouchableOpacity style={styles.button} onPress={() => insertData(user, pass)}>   
+        <Text style={[{color: '#fff'}, {fontSize: 24}]}>Szevasz! Üdvözöllek az Üsd a Röfit gyakprojektünkön!</Text>
+        <TextInput style={[styles.textInput, styles.text_center]} placeholder='username' onChangeText={(value) => SetUser(value)}></TextInput>
+        <TextInput style={[styles.textInput, styles.text_center]} placeholder='password' secureTextEntry={true} onChangeText={(value) => setPass(value)}></TextInput>
+        <TouchableOpacity style={[styles.text_button, styles.button, styles.button_enabled, styles.sign]} onPress={() => insertData(user, pass)}>   
           <Text>
             {"Sign up"}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => handleLogin(user, pass, navigation)}>
+        <TouchableOpacity style={[styles.text_button, styles.button, styles.button_enabled, styles.sign]} onPress={() => handleLogin(user, pass, navigation)}>
           <Text>
             {"Sign in"}
           </Text>
@@ -119,21 +118,24 @@ function GameScreen({navigation}) {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.coin_display,styles.text_center]}>Coins: {coins}</Text>
-      {machineCount>=1 ? (<Text style={[styles.text_center]}>Machine(s) generating {machineCount} coin every 2 seconds</Text>):(<Text style={[styles.text_center]}>You don't have any machines. Earn 10 coins to buy one!</Text>)}
+      <Text style={[styles.coin_display,styles.text_center]}>BITcoinok: {coins}</Text>
+      {machineCount>=1 ? (<Text style={[styles.text_center]}>A kalapácsok {machineCount} BITcoint generálnak /2mp</Text>):(<Text style={[styles.text_center]}>You don't have any machines. Earn 10 coins to buy one!</Text>)}
       <View style={styles.inner_container}>
-      <TouchableOpacity style={[styles.button,styles.button_enabled]} onPress={handleClick}>
-        <Text style={[styles.text_button,styles.text_center]}>Click to Earn Coins</Text>
+      <TouchableOpacity style={[styles.button,styles.button_enabled, styles.pigbutton]} onPress={handleClick}>
+        <Image
+        style = {styles.pig}
+        source={require('@expo/pig.png')}
+        />
       </TouchableOpacity>
       <TouchableOpacity style={[styles.button, styles.button_disabled, coins>=10 && (styles.button_enabled)]} onPress={buyMachine}>
-        <Text style={[styles.text_button,styles.text_center]}>Buy Machine for 10 Coins</Text>
+        <Text style={[styles.text_button,styles.text_center]}>Kalapács : 10 BITcoin       </Text>
       </TouchableOpacity>
       </View>
       <TouchableOpacity style={styles.button_error} onPress={removeCoins}>
-        <Text>Remove coins</Text>
+        <Text>BITcoinok törlése</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.button_error} onPress={removeMachineCount}>
-        <Text>Remove machines</Text>
+        <Text>Kalapácsok törlése</Text>
       </TouchableOpacity>
     </View>
   );
@@ -229,5 +231,21 @@ const styles = StyleSheet.create({
     width: '85%',
     backgroundColor: 'white',
     margin: 20,
+    fontSize: 16,
+    borderRadius: 10,
+  },
+  pig: {
+    width: '100%',
+    height: '120%',
+    
+  },
+  pigbutton: {
+    width: '90%',
+    height: '50%',
+    backgroundColor: 'none'
+  },
+  sign: {
+    padding: 15,
+    width: "70%"
   }
 });
