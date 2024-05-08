@@ -8,17 +8,20 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const SessionContext = createContext(null)
 
 //Register function
-async function insertData(user, pass) {
+async function insertData(user, pass,nav) {
   try {
     const {error} = await supabase
       .from('Users')
-      .insert({ Name: user, Password: pass})
+      .insert({ Name: user, Password: pass, Coin:0, Machine:0})
     if (error) {
       throw new error
     }
   }
   catch (error) {
-    Alert.alert("A felhasználónév már foglalt, kérlek adj meg egy másikat.")
+    Alert.alert(error.message,"A felhasználónév már foglalt, kérlek adj meg egy másikat.")
+  }
+  finally{
+    await handleLogin(user, pass, nav)
   }
 }
 
@@ -39,6 +42,8 @@ async function handleLogin(user, pass, nav) {
 
     if (data.length > 0) {
       // Van találat
+      setCoins(data.Coin)
+      setMachineCount(data.Machine)
       nav.navigate('Game')
     } else {
       // Nincs találat
@@ -61,10 +66,11 @@ function HomeScreen({navigation}) {
   return (
     <SessionContext.Provider value={session}>
       <View style={styles.container}>
-        <Text style={[{color: '#fff'}, {fontSize: 24}]}>Szevasz! Üdvözöllek az Üsd a Röfit gyakprojektünkön!</Text>
+      <Text style={[{color: '#fff'}, {fontSize: 40, textAlign:'center',marginBottom:30}]}>Szevasz!</Text>
+        <Text style={[{color: '#fff'}, {fontSize: 24, textAlign:'center',marginBottom:20}]}>Üdvözlünk az <Text style={[{fontWeight:'bold'}]}>Üsd a Röfit</Text> gyakprojektünkön!</Text>
         <TextInput style={[styles.textInput, styles.text_center]} placeholder='username' onChangeText={(value) => SetUser(value)}></TextInput>
         <TextInput style={[styles.textInput, styles.text_center]} placeholder='password' secureTextEntry={true} onChangeText={(value) => setPass(value)}></TextInput>
-        <TouchableOpacity style={[styles.text_button, styles.button, styles.button_enabled, styles.sign]} onPress={() => insertData(user, pass)}>   
+        <TouchableOpacity style={[styles.text_button, styles.button, styles.button_enabled, styles.sign]} onPress={() => insertData(user, pass,navigation)}>   
           <Text>
             {"Sign up"}
           </Text>
