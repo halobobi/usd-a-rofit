@@ -1,8 +1,91 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { useState, useEffect, createContext } from 'react';
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import supabase from './lib/supabase-client';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-const App = () => {
+const SessionContext = createContext(null)
+
+//Register function
+async function insertData(user, pass) {
+  try {
+    const {error} = await supabase
+      .from('Users')
+      .insert({ Name: user, Password: pass})
+    if (error) {
+      throw new error
+    }
+  }
+  catch (error) {
+    Alert.alert(error.message)
+  }
+}
+
+//Login function
+async function handleLogin(user, pass, nav) {
+  try {
+    
+    const {data, error} = await supabase
+      .from('Users')
+      .select('*')
+      .eq('Name', user)
+      .eq('Password', pass)
+
+    if (error) {
+      throw new error;
+
+    }
+
+    if (data.length > 0) {
+      // Van találat
+      Alert.alert('Juppe')
+      nav.navigate('Game')
+    } else {
+      // Nincs találat
+      Alert.alert('Nincs ilyen felhasználó. Kérlek regisztrálj először');
+    }
+  } catch (error) {
+    Alert.alert('Error checking user:', error.message);
+  }
+}
+
+const Stack = createNativeStackNavigator()
+
+//views
+function HomeScreen({navigation}) {
+  const [user, SetUser] = useState("Name")
+
+  const [pass, setPass] = useState("Password")
+
+  const [session, setSession] = useState(null)
+  return (
+    <SessionContext.Provider value={session}>
+      <View style={styles.container}>
+        <Text style={[{color: '#fff'}]}>Szevasz!</Text>
+        <TextInput style={styles.textInput} onChangeText={(value) => SetUser(value)}></TextInput>
+        <TextInput style={styles.textInput} onChangeText={(value) => setPass(value)}></TextInput>
+        <TouchableOpacity style={styles.button} onPress={() => insertData(user, pass)}>   
+          <Text>
+            {"Sign up"}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => handleLogin(user, pass, navigation)}>
+          <Text>
+            {"Sign in"}
+          </Text>
+        </TouchableOpacity>
+        
+        <StatusBar style="auto" />
+      </View>
+    </SessionContext.Provider>
+  );
+}
+
+function GameScreen({navigation}) {
+  
   const [coins, setCoins] = useState(0);
+  
   const [machineCount, setMachineCount] = useState(0);
 
   const handleClick = () => {
@@ -54,13 +137,53 @@ const App = () => {
       </TouchableOpacity>
     </View>
   );
+}
+
+
+
+//default app
+export default function App() {
+  useEffect(() => {
+    const subscription = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === 'SIGNED_OUT') {
+          setSession(null)
+        } else if (session) {
+          setSession(session)
+        }
+      })
+ 
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [])
+ 
+ 
+   return (
+     <NavigationContainer>
+       <Stack.Navigator initialRouteName="Home">
+         <Stack.Screen name="Home" 
+                       component={HomeScreen}
+                       options={{headerShown: false }} />
+         <Stack.Screen name="Game" 
+                       component={GameScreen} 
+                       options={{headerShown: false }} />
+       </Stack.Navigator>
+     </NavigationContainer> 
+   );
 };
 
+
+
+
+
+//styles
 const styles = StyleSheet.create({
   container:{
-    backgroundColor:'white',
+    backgroundColor:'#12b0b0',
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
     paddingTop:40,
   },
   inner_container: {
@@ -72,10 +195,13 @@ const styles = StyleSheet.create({
     borderRadius:15
   },
   button: {
-    margin:10,
+    margin:16,
     padding: 20,
     width:'95%',
-    borderRadius:15
+    borderRadius: 15,
+    flexDirection: "row",
+    justifyContent: "center",
+
   },
   button_error: {
     backgroundColor: 'pink',
@@ -97,7 +223,11 @@ const styles = StyleSheet.create({
   },
   text_center:{
     textAlign:'center'
+  },
+  textInput: {
+    height: 50,
+    width: '85%',
+    backgroundColor: 'white',
+    margin: 20,
   }
 });
-
-export default App;
