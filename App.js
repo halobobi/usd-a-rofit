@@ -124,7 +124,7 @@ function GameScreen({navigation}) {
       <TouchableOpacity style={[styles.button,styles.button_enabled, styles.pigbutton]} onPress={handleClick}>
         <Image
         style = {styles.pig}
-        source={require('@expo/pig.png')}
+        source={require('./pig.png')}
         />
       </TouchableOpacity>
       <TouchableOpacity style={[styles.button, styles.button_disabled, coins>=10 && (styles.button_enabled)]} onPress={buyMachine}>
