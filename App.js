@@ -119,7 +119,7 @@ function GameScreen({navigation}) {
   return (
     <View style={styles.container}>
       <Text style={[styles.coin_display,styles.text_center]}>BITcoinok: {coins}</Text>
-      {machineCount>=1 ? (<Text style={[styles.text_center]}>A kalapácsok {machineCount} BITcoint generálnak /2mp</Text>):(<Text style={[styles.text_center]}>You don't have any machines. Earn 10 coins to buy one!</Text>)}
+      {machineCount>=1 ? (<Text style={[styles.text_center]}>A kalapácsok {machineCount} BITcoint generálnak /2mp</Text>):(<Text style={[styles.text_center]}>Nincsen egy kalapácsod se. Gyűjts össze 10 BITcoint, hogy vehess egyet!</Text>)}
       <View style={styles.inner_container}>
       <TouchableOpacity style={[styles.button,styles.button_enabled, styles.pigbutton]} onPress={handleClick}>
         <Image
