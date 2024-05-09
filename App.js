@@ -57,7 +57,7 @@ async function handleLogin(user, pass, nav) {
       Alert.alert('Nincs ilyen felhasználó! Kérlek regisztrálj először.');
     }
   } catch (error) {
-    Alert.alert('Error checking user:', error.message);
+    Alert.alert('A mejelentkezés során egy hiba lépett fel:', error.message);
   }
 }
 
