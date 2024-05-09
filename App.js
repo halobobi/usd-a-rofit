@@ -40,10 +40,17 @@ async function handleLogin(user, pass, nav) {
 
     }
 
+    global.coin=0
+    global.machine=0
+
+    global.user=user
+    global.pass=pass
+
     if (data.length > 0) {
       // Van találat
-      setCoins(data.Coin)
-      setMachineCount(data.Machine)
+      global.coin=data[0].Coin
+      global.machine=data[0].Machine
+
       nav.navigate('Game')
     } else {
       // Nincs találat
@@ -89,43 +96,108 @@ function HomeScreen({navigation}) {
 
 function GameScreen({navigation}) {
   
-  const [coins, setCoins] = useState(0);
+  const [coins, setCoins] = useState(global.coin);
   
-  const [machineCount, setMachineCount] = useState(0);
+  const [machineCount, setMachineCount] = useState(global.machine);
 
-  const handleClick = () => {
+  const handleClick = async () => {
     setCoins(coins + 1);
+
+    try {
+      const {error} = await supabase
+        .from('Users')
+        .update({Coin:coins+1})
+        .eq('Name',global.user)
+      if (error) {
+        throw new error
+      }
+    }
+    catch (error) {
+      Alert.alert(error.message,"Hiba az adatok mentése során.")
+    }
   };
 
-  const removeCoins = () => {
+  const removeCoins = async () => {
     setCoins(0);
+
+    try {
+      const {error} = await supabase
+        .from('Users')
+        .update({Coin:0})
+        .eq('Name',global.user)
+      if (error) {
+        throw new error
+      }
+    }
+    catch (error) {
+      Alert.alert(error.message,"Hiba az adatok mentése során.")
+    }
   };
 
-  const removeMachineCount = () => {
+  const removeMachineCount = async () => {
     setMachineCount(0);
+
+    try {
+      const {error} = await supabase
+        .from('Users')
+        .update({Machine:0})
+        .eq('Name',global.user)
+      if (error) {
+        throw new error
+      }
+    }
+    catch (error) {
+      Alert.alert(error.message,"Hiba az adatok mentése során.")
+    }
   };
 
-  const buyMachine = () => {
+  const buyMachine = async () => {
     if (coins >= 10) {
       setCoins(coins - 10);
       setMachineCount(machineCount + 1)
+      
+      try {
+        const {error} = await supabase
+          .from('Users')
+          .update({Coin:coins, Machine:machineCount+1})
+          .eq('Name',global.user)
+        if (error) {
+          throw new error
+        }
+      }
+      catch (error) {
+        Alert.alert(error.message,"Hiba az adatok mentése során.")
+      }
     }
   };
 
   useEffect(() => {
     let interval;
     if (machineCount>=1) {
-      interval = setInterval(() => {
+      interval = setInterval(async () => {
         setCoins(prevCoins => prevCoins + 1*machineCount);
+
+        try {
+          const {error} = await supabase
+            .from('Users')
+            .update({Coin:coins+machineCount})
+            .eq('Name',global.user)
+          if (error) {
+            throw new error
+          }
+        }
+        catch (error) {
+          Alert.alert(error.message,"Hiba az adatok mentése során.")
+        }
       }, 2000);
     }
     return () => clearInterval(interval);
-  },[machineCount]);
+  },[coins, machineCount]);
 
   return (
     <View style={styles.container}>
       <Text style={[styles.coin_display,styles.text_center]}>BITcoinok: {coins}</Text>
-      {machineCount>=1 ? (<Text style={[styles.text_center]}>A kalapácsok {machineCount} BITcoint generálnak /2mp</Text>):(<Text style={[styles.text_center]}>Nincsen egy kalapácsod se. Gyűjts össze 10 BITcoint, hogy vehess egyet!</Text>)}
+      {machineCount>=1 ? (<Text style={[styles.text_center,{fontSize:18}]}>A kalapácsok {machineCount} BITcoint generálnak / 2mp</Text>):(<Text style={[styles.text_center,{fontSize:20}]}>Nincsen egy kalapácsod se!</Text>)}
       <View style={styles.inner_container}>
       <TouchableOpacity style={[styles.button,styles.button_enabled, styles.pigbutton]} onPress={handleClick}>
         <Image
@@ -137,10 +209,10 @@ function GameScreen({navigation}) {
         <Text style={[styles.text_button,styles.text_center]}>Kalapács : 10 BITcoin       </Text>
       </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.button_error} onPress={removeCoins}>
+      <TouchableOpacity style={[styles.button,styles.button_error]} onPress={removeCoins}>
         <Text>BITcoinok törlése</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button_error} onPress={removeMachineCount}>
+      <TouchableOpacity style={[styles.button,styles.button_error]} onPress={removeMachineCount}>
         <Text>Kalapácsok törlése</Text>
       </TouchableOpacity>
     </View>
@@ -212,6 +284,7 @@ const styles = StyleSheet.create({
 
   },
   button_error: {
+    width:'60%',
     backgroundColor: 'pink',
     padding: 10,
     marginVertical: 10,
@@ -246,6 +319,7 @@ const styles = StyleSheet.create({
     
   },
   pigbutton: {
+    marginBottom:80,
     width: '90%',
     height: '50%',
     backgroundColor: 'none'
